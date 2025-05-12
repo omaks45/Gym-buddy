@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String   @unique
+  password      String? // Nullable for OAuth users
+  googleId      String?  @unique
+  isActive      Boolean  @default(true)
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  profile          Profile?
+  sentLikes        Like[]      @relation("SentLikes")
+  receivedLikes    Like[]      @relation("ReceivedLikes")
+  sentMessages     Message[]   @relation("SentMessages")
+  receivedMessages Message[]   @relation("ReceivedMessages")
+  userGroups       UserGroup[]
+  ownedGroups      Group[]     @relation("GroupOwner")
+  lastLocation     Location?
+}
+
+model Profile {
+  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String       @unique @db.ObjectId
+  displayName        String
+  bio                String?
+  birthDate          DateTime
+  gender             Gender
+  fitnessLevel       FitnessLevel
+  fitnessGoals       String[]
+  workoutPreferences String[]
+  avatarUrl          String?
+  profileImages      String[]
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Location {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  latitude  Float
+  longitude Float
+  gymName   String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  receiverId String   @db.ObjectId
+  isLiked    Boolean // true for like, false for reject
+  createdAt  DateTime @default(now())
+
+  sender   User    @relation("SentLikes", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User    @relation("ReceivedLikes", fields: [receiverId], references: [id], onDelete: Cascade)
+  match    Match?  @relation(fields: [matchId], references: [id])
+  matchId  String? @db.ObjectId
+
+  @@unique([senderId, receiverId])
+}
+
+model Match {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  user1Id   String    @db.ObjectId
+  user2Id   String    @db.ObjectId
+  createdAt DateTime  @default(now())
+  likes     Like[]
+  messages  Message[]
+
+  @@unique([user1Id, user2Id])
+}
+
+model Message {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  content    String
+  senderId   String   @db.ObjectId
+  receiverId String   @db.ObjectId
+  matchId    String?  @db.ObjectId
+  groupId    String?  @db.ObjectId
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  match    Match? @relation(fields: [matchId], references: [id], onDelete: SetNull)
+  group    Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+}
+
+model Group {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  ownerId     String   @db.ObjectId
+  isPrivate   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner    User        @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members  UserGroup[]
+  messages Message[]
+}
+
+model UserGroup {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String    @db.ObjectId
+  groupId  String    @db.ObjectId
+  role     GroupRole @default(MEMBER)
+  joinedAt DateTime  @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+  OTHER
+}
+
+enum FitnessLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum GroupRole {
+  MEMBER
+  MODERATOR
+  ADMIN
+}
