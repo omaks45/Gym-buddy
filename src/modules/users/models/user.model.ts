@@ -19,6 +19,9 @@ export class User {
 
   @Field({ nullable: true })
   googleId?: string;
+  
+  @Field({ nullable: true })
+  appleId?: string;
 
   @Field()
   isActive: boolean;
@@ -50,6 +53,10 @@ export class User {
   @Field(() => [Message], { nullable: true })
   receivedMessages?: Message[];
 
-  // Field not exposed in GraphQL
+  // Fields not exposed in GraphQL
   password?: string;
+  verificationToken?: string;
+  verificationTokenExpiry?: Date;
+  resetPasswordToken?: string;
+  resetPasswordTokenExpiry?: Date;
 }

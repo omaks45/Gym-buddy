@@ -1,7 +1,32 @@
 /* eslint-disable prettier/prettier */
-import { Field, ID, ObjectType, Float } from '@nestjs/graphql';
-import { User } from '../../users/models/user.model';
-import { Message } from '../../messages/models/message.model';
+import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { Message } from "src/modules/messages/models/message.model";
+import { User } from "src/modules/users/models/user.model";
+
+/* eslint-disable prettier/prettier */
+@ObjectType()
+export class Match {
+  @Field(() => ID)
+  id: string;
+
+  @Field()
+  user1Id: string;
+
+  @Field()
+  user2Id: string;
+
+  @Field()
+  createdAt: Date;
+
+  @Field(() => User)
+  user1?: User;
+
+  @Field(() => User)
+  user2?: User;
+
+  @Field(() => [Message], { nullable: true })
+  messages?: Message[];
+}
 
 @ObjectType()
 export class Like {
@@ -28,43 +53,4 @@ export class Like {
 
   @Field(() => Match, { nullable: true })
   match?: Match;
-}
-
-@ObjectType()
-export class Match {
-  @Field(() => ID)
-  id: string;
-
-  @Field()
-  user1Id: string;
-
-  @Field()
-  user2Id: string;
-
-  @Field()
-  createdAt: Date;
-
-  @Field(() => User)
-  user1?: User;
-
-  @Field(() => User)
-  user2?: User;
-
-  @Field(() => [Message], { nullable: true })
-  messages?: Message[];
-}
-
-@ObjectType()
-export class PotentialMatch {
-  @Field(() => User)
-  user: User;
-  
-  @Field(() => Boolean, { nullable: true })
-  hasLikedYou?: boolean;
-  
-  @Field(() => Float, { nullable: true })
-  compatibilityScore?: number;
-  
-  @Field(() => Float, { nullable: true })
-  distance?: number;
 }

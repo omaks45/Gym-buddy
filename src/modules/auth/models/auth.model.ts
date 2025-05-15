@@ -2,15 +2,15 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { User } from '../../users/models/user.model';
 
-@ObjectType()
+@ObjectType({ description: 'Response returned after successful login or registration' })
 export class AuthResponse {
-  @Field()
+  @Field({ description: 'Access token for authenticated requests' })
   accessToken: string;
 
-  @Field()
+  @Field({ description: 'Refresh token for renewing sessions' })
   refreshToken: string;
 
-  @Field(() => User)
+  @Field(() => User, { description: 'Authenticated user info' })
   user: User;
 }
 

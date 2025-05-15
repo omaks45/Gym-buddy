@@ -1,0 +1,199 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""Response returned after successful login or registration"""
+type AuthResponse {
+  """Access token for authenticated requests"""
+  accessToken: String!
+
+  """Refresh token for renewing sessions"""
+  refreshToken: String!
+
+  """Authenticated user info"""
+  user: User!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum FitnessLevel {
+  ADVANCED
+  BEGINNER
+  EXPERT
+  INTERMEDIATE
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  NON_BINARY
+  OTHER
+}
+
+type Group {
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  isPrivate: Boolean!
+  memberCount: Int!
+  members: [UserGroup!]
+  messages: [Message!]
+  name: String!
+  owner: User!
+  ownerId: String!
+  updatedAt: DateTime!
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
+  MODERATOR
+}
+
+type Location {
+  address: String
+  createdAt: DateTime!
+  gymName: String
+  id: ID!
+  latitude: Float!
+  longitude: Float!
+  updatedAt: DateTime!
+  user: User!
+  userId: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Match {
+  createdAt: DateTime!
+  id: ID!
+  messages: [Message!]
+  user1: User!
+  user1Id: String!
+  user2: User!
+  user2Id: String!
+}
+
+type Message {
+  content: String!
+  createdAt: DateTime!
+  group: Group
+  groupId: String
+  id: ID!
+  match: Match
+  matchId: String
+  read: Boolean!
+  receiver: User!
+  receiverId: String!
+  sender: User!
+  senderId: String!
+  updatedAt: DateTime!
+}
+
+type Mutation {
+  appleLogin(appleLoginInput: SocialLoginInput!): AuthResponse!
+  googleLogin(googleOginInput: SocialLoginInput!): AuthResponse!
+  login(loginInput: LoginInput!): AuthResponse!
+  refreshToken(refreshtokenInput: RefreshTokenInput!): TokenResponse!
+
+  """Register a new user"""
+  register(signupInput: RegisterInput!): User!
+  requestPasswordReset(requestPasswordResetInput: RequestPasswordResetInput!): Boolean!
+  resetPassword(resetPasswordInput: ResetPasswordInput!): Boolean!
+  verifyEmail(verifyEmailInput: VerifyEmailInput!): Boolean!
+}
+
+type Profile {
+  avatarUrl: String
+  bio: String
+  birthDate: DateTime!
+  createdAt: DateTime!
+  displayName: String!
+  fitnessGoals: [String!]!
+  fitnessLevel: FitnessLevel!
+  gender: Gender!
+  id: ID!
+  profileImages: [String!]
+  updatedAt: DateTime!
+  user: User!
+  userId: String!
+  workoutPreferences: [String!]!
+}
+
+type Query {
+  hello: String!
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
+}
+
+"""Data required to register a new user"""
+input RegisterInput {
+  """User email address"""
+  email: String!
+
+  """User display name"""
+  fullName: String!
+
+  """User password"""
+  password: String!
+}
+
+input RequestPasswordResetInput {
+  email: String!
+}
+
+input ResetPasswordInput {
+  password: String!
+  token: String!
+}
+
+input SocialLoginInput {
+  fullName: String
+  token: String!
+}
+
+type TokenResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type User {
+  appleId: String
+  createdAt: DateTime!
+  email: String!
+  emailVerified: Boolean!
+  fullName: String!
+  googleId: String
+  groups: [Group!]
+  id: ID!
+  isActive: Boolean!
+  lastLocation: Location
+  matches: [Match!]
+  profile: Profile
+  receivedMessages: [Message!]
+  sentMessages: [Message!]
+  updatedAt: DateTime!
+}
+
+type UserGroup {
+  group: Group!
+  groupId: String!
+  id: ID!
+  joinedAt: DateTime!
+  role: GroupRole!
+  user: User!
+  userId: String!
+}
+
+input VerifyEmailInput {
+  email: String!
+  verificationToken: String!
+}

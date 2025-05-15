@@ -8,6 +8,9 @@ RUN npm install
 
 COPY . .
 
+# Generate Prisma client after code is copied
+RUN npx prisma generate
+
 # Build only for production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -27,6 +30,9 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=builder /app/dist ./dist
 COPY .env .env
+
+# Re-run Prisma generate here
+RUN npx prisma generate
 
 CMD ["node", "dist/main"]
 

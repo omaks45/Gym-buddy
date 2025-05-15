@@ -4,14 +4,16 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
-import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
-import { ProfilesModule } from './modules/profiles/profiles.module';
-import { LocationsModule } from './modules/locations/locations.module';
-import { MatchingModule } from './modules/matching/matching.module';
-import { GroupsModule } from './modules/groups/groups.module';
-import { MessagesModule } from './modules/messages/messages.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { AuthModule } from './modules/auth/auths/auths.module';
+import { AppResolver } from './app.resolver';
+//import { UsersModule } from './modules/users/users.module';
+//import { ProfilesModule } from './modules/profiles/profiles.module';
+//import { LocationsModule } from './modules/locations/locations.module';
+//import { MatchingModule } from './modules/matching/matching.module';
+//import { GroupsModule } from './modules/groups/groups.module';
+//import { MessagesModule } from './modules/messages/messages.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -51,7 +53,7 @@ import { MessagesModule } from './modules/messages/messages.module';
               code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
               exception: {
                 stacktrace: configService.get('NODE_ENV') !== 'production' 
-                  ? error.extensions?.exception?.stacktrace 
+                  ? (error.extensions?.exception as any)?.stacktrace 
                   : undefined,
               },
             },
@@ -62,12 +64,15 @@ import { MessagesModule } from './modules/messages/messages.module';
     }),
     PrismaModule,
     AuthModule,
-    UsersModule,
-    ProfilesModule,
-    LocationsModule,
-    MatchingModule,
-    GroupsModule,
-    MessagesModule,
+   //UsersModule,
+    NotificationsModule,
+    //ProfilesModule,
+    //LocationsModule,
+    //MatchingModule,
+    //GroupsModule,
+    //MessagesModule,
   ],
+
+  providers: [AppResolver],
 })
 export class AppModule {}

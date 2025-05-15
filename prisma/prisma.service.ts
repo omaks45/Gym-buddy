@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, OnModuleInit, OnModuleDestroy, INestApplication } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -18,15 +18,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     await this.$disconnect();
   }
 
-  async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
-  }
-
-  // Helper function to exclude password from user
-  excludePasswordFromUser<User extends { password?: string }>(user: User): Omit<User, 'password'> {
+  excludePasswordFromUser<User extends { password?: string }>(
+    user: User,
+  ): Omit<User, 'password'> {
     if (user) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...userWithoutPassword } = user;
       return userWithoutPassword;
     }
